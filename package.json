@@ -1,0 +1,68 @@
+{
+  "name": "@charles_lindecker/img-convertor",
+  "version": "1.0.0",
+  "description": "Fast image converter and responsive breakpoint resizer with an interactive console and a professional CLI.",
+  "author": "Charles Lindecker <charles.lindecker@outlook.fr>",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "img-convertor": "./bin/img-convertor.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"import('node:fs').then(fs=>fs.rmSync('dist',{recursive:true,force:true}))\"",
+    "prebuild": "npm run clean",
+    "dev": "node --loader tsx/esm src/cli/index.ts",
+    "start": "node bin/img-convertor.js",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "ci": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "image",
+    "converter",
+    "resize",
+    "webp",
+    "breakpoints",
+    "cli",
+    "sharp",
+    "responsive"
+  ],
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.0",
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LINDECKER-Charles/Web-Image-Formateur.git"
+  }
+}

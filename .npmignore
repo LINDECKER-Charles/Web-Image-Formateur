@@ -1,0 +1,9 @@
+archive/
+src/
+tsconfig.json
+.gitignore
+.gitattributes
+*.tsbuildinfo
+.github/
+.vscode/
+node_modules/
