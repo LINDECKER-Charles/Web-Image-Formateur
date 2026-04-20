@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import {
+  computeDisambiguators,
   runConvert,
   runResize,
   runResizeConvert,
@@ -84,6 +85,88 @@ describe('runResize', () => {
     expect(results[0]!.skipped).toBeDefined();
     expect(results[0]!.outputs).toEqual([]);
     expect(calls).toHaveLength(1);
+  });
+});
+
+describe('computeDisambiguators', () => {
+  test('returns undefined for every source when no collision', () => {
+    const map = computeDisambiguators(['/x/hero.jpg', '/x/other.png'], 'webp');
+    expect(map.get('/x/hero.jpg')).toBeUndefined();
+    expect(map.get('/x/other.png')).toBeUndefined();
+  });
+
+  test('flags every colliding source with its extension', () => {
+    const map = computeDisambiguators(['/x/hero.jpg', '/x/hero.png'], 'webp');
+    expect(map.get('/x/hero.jpg')).toBe('jpg');
+    expect(map.get('/x/hero.png')).toBe('png');
+  });
+
+  test('does not collide when keeping source extension (no format)', () => {
+    const map = computeDisambiguators(['/x/hero.jpg', '/x/hero.png']);
+    expect(map.get('/x/hero.jpg')).toBeUndefined();
+    expect(map.get('/x/hero.png')).toBeUndefined();
+  });
+
+  test('scopes collisions per directory', () => {
+    const map = computeDisambiguators(['/a/hero.jpg', '/b/hero.png'], 'webp');
+    expect(map.get('/a/hero.jpg')).toBeUndefined();
+    expect(map.get('/b/hero.png')).toBeUndefined();
+  });
+});
+
+describe('batch collision behavior (regression)', () => {
+  test('convert: same basename + different extensions produce distinct outputs', async () => {
+    const collisionDir = join(dir, 'collide');
+    const { mkdir } = await import('node:fs/promises');
+    await mkdir(collisionDir, { recursive: true });
+
+    const jpgSrc = join(collisionDir, 'images.jpg');
+    const pngSrc = join(collisionDir, 'images.png');
+    await sharp({ create: { width: 100, height: 50, channels: 3, background: '#f00' } })
+      .jpeg()
+      .toFile(jpgSrc);
+    await sharp({ create: { width: 100, height: 50, channels: 3, background: '#0f0' } })
+      .png()
+      .toFile(pngSrc);
+
+    const results = await runConvert({
+      files: [jpgSrc, pngSrc],
+      format: 'webp',
+      quality: 80,
+    });
+
+    expect(results).toHaveLength(2);
+    const outputs = results.flatMap((r) => r.outputs);
+    expect(new Set(outputs).size).toBe(2);
+    expect(outputs.some((o) => o.endsWith('images.jpg.webp'))).toBe(true);
+    expect(outputs.some((o) => o.endsWith('images.png.webp'))).toBe(true);
+  });
+
+  test('resize: same basename + different extensions + format produce distinct outputs', async () => {
+    const collisionDir = join(dir, 'collide-resize');
+    const { mkdir } = await import('node:fs/promises');
+    await mkdir(collisionDir, { recursive: true });
+
+    const jpgSrc = join(collisionDir, 'hero.jpg');
+    const pngSrc = join(collisionDir, 'hero.png');
+    await sharp({ create: { width: 800, height: 400, channels: 3, background: '#f00' } })
+      .jpeg()
+      .toFile(jpgSrc);
+    await sharp({ create: { width: 800, height: 400, channels: 3, background: '#0f0' } })
+      .png()
+      .toFile(pngSrc);
+
+    const results = await runResizeConvert({
+      files: [jpgSrc, pngSrc],
+      format: 'webp',
+      breakpoints: [400],
+      quality: 80,
+    });
+
+    const outputs = results.flatMap((r) => r.outputs);
+    expect(new Set(outputs).size).toBe(outputs.length);
+    expect(outputs.some((o) => o.endsWith('400x200_hero.jpg.webp'))).toBe(true);
+    expect(outputs.some((o) => o.endsWith('400x200_hero.png.webp'))).toBe(true);
   });
 });
 

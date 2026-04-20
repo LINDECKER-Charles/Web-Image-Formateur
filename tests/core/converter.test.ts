@@ -152,4 +152,14 @@ describe('destination helpers', () => {
       join('.', '320x200_foo.webp'),
     );
   });
+
+  test('defaultDestination injects disambiguator infix when provided', () => {
+    expect(basename(defaultDestination('/x/hero.png', 'webp', 'png'))).toBe('hero.png.webp');
+  });
+
+  test('resizedDestination injects disambiguator infix when provided', () => {
+    expect(basename(resizedDestination('/x/hero.png', 320, 200, 'webp', 'png'))).toBe(
+      '320x200_hero.png.webp',
+    );
+  });
 });

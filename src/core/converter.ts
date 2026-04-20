@@ -9,6 +9,8 @@ export interface ConvertFileParams {
   quality: number;
   /** Optional explicit destination path; otherwise derived from source. */
   destination?: string;
+  /** Optional infix (e.g. source extension) to disambiguate colliding outputs. */
+  disambiguator?: string;
 }
 
 /**
@@ -19,8 +21,9 @@ export async function convertFile({
   format,
   quality,
   destination,
+  disambiguator,
 }: ConvertFileParams): Promise<string> {
-  const dest = destination ?? defaultDestination(source, format);
+  const dest = destination ?? defaultDestination(source, format, disambiguator);
   await pipeline(sharp(source, { failOn: 'none' }), format, quality).toFile(dest);
   return dest;
 }
@@ -43,9 +46,14 @@ export function pipeline(img: Sharp, format: ImageFormat, quality: number): Shar
   }
 }
 
-export function defaultDestination(source: string, format: ImageFormat): string {
+export function defaultDestination(
+  source: string,
+  format: ImageFormat,
+  disambiguator?: string,
+): string {
   const { dir, name } = parse(source);
-  return join(dir || '.', `${name}.${extensionFor(format)}`);
+  const infix = disambiguator ? `.${disambiguator}` : '';
+  return join(dir || '.', `${name}${infix}.${extensionFor(format)}`);
 }
 
 export function resizedDestination(
@@ -53,8 +61,10 @@ export function resizedDestination(
   width: number,
   height: number,
   format: ImageFormat | undefined,
+  disambiguator?: string,
 ): string {
   const { dir, name, ext } = parse(source);
   const targetExt = format ? `.${extensionFor(format)}` : ext;
-  return join(dir || dirname(source), `${width}x${height}_${name}${targetExt}`);
+  const infix = disambiguator ? `.${disambiguator}` : '';
+  return join(dir || dirname(source), `${width}x${height}_${name}${infix}${targetExt}`);
 }

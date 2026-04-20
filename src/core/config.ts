@@ -8,6 +8,8 @@ export const SUPPORTED_INPUT_EXTENSIONS = new Set<string>([
   '.avif',
   '.tif',
   '.tiff',
+  '.gif',
+  '.svg',
 ]);
 
 export const SUPPORTED_OUTPUT_FORMATS: readonly ImageFormat[] = [

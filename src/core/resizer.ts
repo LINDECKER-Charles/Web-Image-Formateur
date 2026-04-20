@@ -8,6 +8,8 @@ export interface ResizeFileParams {
   quality: number;
   /** When set, re-encode each variant into this format. Otherwise preserve source encoding. */
   format?: ImageFormat;
+  /** Optional infix inserted into every output filename to disambiguate colliding outputs. */
+  disambiguator?: string;
 }
 
 export interface ResizeFileResult {
@@ -23,6 +25,7 @@ export async function resizeFile({
   breakpoints,
   quality,
   format,
+  disambiguator,
 }: ResizeFileParams): Promise<ResizeFileResult> {
   const base = sharp(source, { failOn: 'none' });
   const meta = await base.metadata();
@@ -39,7 +42,7 @@ export async function resizeFile({
   for (const bp of breakpoints) {
     if (bp >= srcWidth) continue;
     const height = Math.max(1, Math.round((srcHeight * bp) / srcWidth));
-    const destination = resizedDestination(source, bp, height, format);
+    const destination = resizedDestination(source, bp, height, format, disambiguator);
 
     let img = sharp(source, { failOn: 'none' }).resize({
       width: bp,
