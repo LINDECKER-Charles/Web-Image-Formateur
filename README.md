@@ -3,7 +3,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/LINDECKER-Charles/Web-Image-Formateur/ci.yml?branch=main&label=CI&logo=github)](https://github.com/LINDECKER-Charles/Web-Image-Formateur/actions/workflows/ci.yml)
 [![tests](https://img.shields.io/badge/tests-80%20passed-brightgreen?logo=vitest&logoColor=white)](#testing)
 [![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?logo=vitest&logoColor=white)](#testing)
-[![node](https://img.shields.io/node/v/@charles_lindecker/img-convertor)](https://nodejs.org/)
+[![node](https://img.shields.io/badge/node-%E2%89%A518.17-brightgreen?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![npm version](https://img.shields.io/npm/v/@charles_lindecker/img-convertor.svg?logo=npm)](https://www.npmjs.com/package/@charles_lindecker/img-convertor)
 [![license](https://img.shields.io/badge/license-MIT-blue)](./LICENSE)
 
@@ -340,11 +340,11 @@ matrix.
 
 GitHub Actions runs `typecheck → test → build` on every push and PR:
 
-- Linux (Node 18, 20, 22)
-- Windows (Node 20)
-- macOS (Node 20)
+- Linux (Node 18, 20, 22, 24)
+- Windows (Node 22)
+- macOS (Node 22)
 
-A separate `coverage` job runs on Node 20 and uploads the `lcov` report as a
+A separate `coverage` job runs on Node 22 and uploads the `lcov` report as a
 build artifact. See [`.github/workflows/ci.yml`](./.github/workflows/ci.yml).
 
 ---
