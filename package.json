@@ -1,6 +1,6 @@
 {
   "name": "@charles_lindecker/img-convertor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fast image converter and responsive breakpoint resizer with an interactive console and a professional CLI.",
   "author": "Charles Lindecker <charles.lindecker@outlook.fr>",
   "license": "MIT",
